@@ -27,9 +27,22 @@ echo "Create an Azure Machine Learning workspace:"
 az ml workspace create --name $WORKSPACE_NAME 
 az configure --defaults workspace=$WORKSPACE_NAME 
 
-# Create compute instance
-echo "Creating a compute instance with name: " $COMPUTE_INSTANCE
-az ml compute create --name ${COMPUTE_INSTANCE} --size STANDARD_E2D_V4 --type ComputeInstance 
+# 4. Programmatically generate the infrastructure configuration file
+echo "Generating declarative YAML configuration asset..."
+cat << EOF > compute-instance-config.yml
+\$schema: https://azuremlschemas.azureedge.net/latest/computeInstance.schema.json
+name: ${COMPUTE_INSTANCE}
+type: ComputeInstance
+size: STANDARD_E2D_V4
+schedules:
+  idle_time_before_shutdown: PT15M  # Automatically shuts down after 15 minutes of complete inactivity
+EOF
+
+echo "YAML file successfully written to: ./compute-instance-config.yml"
+
+# 5. Execute the infrastructure-as-code deployment command
+echo "Submitting deployment contract to Azure Resource Manager..."
+az ml compute create --file compute-instance-config.yml
 
 # Create compute cluster
 echo "Creating a compute cluster with name: " $COMPUTE_CLUSTER
