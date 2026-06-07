@@ -14,6 +14,6 @@ jobs:
     - name: Azure Login (Using Client Secret)
       uses: azure/login@v2
       with:
-        creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+        creds: ${{secrets.AZURE_CREDENTIALS}}
     - name: Run Azure Machine Learning training job
       run: az ml job create -f src/job.yml --stream --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --workspace-name ${{ vars.AZURE_WORKSPACE_NAME }}
